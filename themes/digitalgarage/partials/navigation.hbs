@@ -1,0 +1,31 @@
+<header id="masthead">
+	<div id="navigation-bar" class="clearfix">
+		{{#if @blog.logo}}<a href="{{@blog.url}}" class="logo"><img class="brand-logo dark" src="{{@blog.logo}}" alt="{{@blog.title}}"></a>{{/if}}
+		<div class="search-box">
+            <a id="btn-search" class="btn btn-theme">
+                <span>Search</span> <i class="fa fa-search"></i>
+            </a>
+            <div class="search-form">
+                <form class="form-inline" role="form">
+                    <div class="form-group">
+                        <input class="form-control" id="search-keyword" placeholder="Enter keyword" type="text" name="keyword" />
+                    </div>
+                </form>
+                <div id="search-result"></div>
+            </div>
+        </div>
+		<div id="mobile-nav-toggle" class="hidden-md hidden-lg">
+			<span class="bar"></span>
+			<span class="bar"></span>
+			<span class="bar"></span>
+		</div>
+		<ul class="social-links"></ul>
+		<nav id="main-navigation">
+			<ul class="nav-list clearfix">
+				{{#foreach navigation}}
+          			<li class="menu-item nav-{{slug}}{{#if current}} nav-current{{/if}}" role="presentation"><a href="{{url absolute="true"}}">{{label}}</a></li>
+        		{{/foreach}}
+			</ul>
+		</nav>
+	</div>
+</header>
