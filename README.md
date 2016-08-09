@@ -37,4 +37,4 @@ There are three environment variables that can be configured:
 * `MAIL_USER`: username on mailgun account
 * `MAIL_PASSWORD`: password on mailgun account
 
-Please visit this `http://support.ghost.org/mail` for details.
+Please visit this `http://support.ghost.org/mail` for mailing details.

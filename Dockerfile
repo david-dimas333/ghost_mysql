@@ -22,7 +22,7 @@ RUN chown -R user $GHOST_SOURCE/content
 # Install GIT
 RUN apt-get update && apt-get install -y git
 
-# currently only works for development
+# Currently only works for development
 ENV NODE_ENV development
 
 # Port 2368 for ghost server
