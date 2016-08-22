@@ -20,7 +20,11 @@
  					{{#post}}
 					<article class="post">
 						<div class="entry-meta clearfix">
-							<img class="author-image" src="{{author.image}}" alt="{{author.name}}">
+							{{#if author.image}}
+								<img class="author-image" src="{{author.image}}" alt="{{author.name}}">
+							{{else}}
+								<img class="author-image" src="{{asset "img/user.jpg"}}" alt="{{author.name}}">
+							{{/if}}
 							<div class="right">
 								<span class="author-name">{{author}}</span>
 								<span class="entry-date" title="{{date format="DD MMMM YYYY"}}"><time datetime="{{date format='YYYY-MM-DD'}}">{{date format="DD MMM YYYY"}}</time></span>
@@ -44,7 +48,11 @@
 
 					<div id="about-author">
 						<div class="author-image">
-							<img src="{{author.image}}" alt="{{author.name}}">
+							{{#if author.image}}
+								<img src="{{author.image}}" alt="{{author.name}}">
+							{{else}}
+								<img src="{{asset "img/user.jpg"}}" alt="{{author.name}}">
+							{{/if}}
 						</div>
 						<div class="author-info">
 							<h4 class="author-name align-center">{{author}}</h4>

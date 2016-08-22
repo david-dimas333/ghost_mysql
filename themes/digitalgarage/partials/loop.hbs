@@ -11,7 +11,11 @@
 	{{/if}}
 	<div class="entry-content">
 		<div class="entry-meta clearfix">
-			{{#if author.image}}<img class="author-image" src="{{author.image}}" alt="{{author.name}}">{{/if}}
+			{{#if author.image}}
+				<img class="author-image" src="{{author.image}}" alt="{{author.name}}">
+			{{else}}
+				<img class="author-image" src="{{asset "img/user.jpg"}}" alt="{{author.name}}">
+			{{/if}}
 			<div class="right">
 				<span class="author-name">{{author}}</span>
 				<span class="entry-date" title="{{date format="DD MMMM YYYY"}}"><time datetime="{{date format='YYYY-MM-DD'}}">{{date format="DD MMM YYYY"}}</time></span>
