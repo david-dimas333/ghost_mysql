@@ -478,7 +478,7 @@
       "displayName": "Application Hostname",
       "description": "The exposed hostname that will route to the Ghost service.",
       "required": true,
-      "value": "http://apps.thedigitalgarage.io/community"
+      "value": "http://www.thedigitalgarage.io/community"
     },
     {
       "name": "MEMORY_LIMIT",

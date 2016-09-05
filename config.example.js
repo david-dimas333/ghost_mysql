@@ -6,10 +6,13 @@ var path = require('path'),
     config;
 
 config = {
-    // ### Development **(default)**
-    development: {
+    // ### Production
+    // When running Ghost in the wild, use the production environment
+    // Configure your URL and mail settings here
+    production: {
         // The url to use when providing links to the site, E.g. in RSS and email.
         url: process.env.GHOST_URL,
+        forceAdminSSL: false,
         mail: {
             transport: 'SMTP',
             options: {
@@ -38,15 +41,13 @@ config = {
         },
         paths: {
             contentPath: path.join(__dirname, '/content/')
-        }
+        },
+        logging: false
     },
 
-    // ### Production
-    // When running Ghost in the wild, use the production environment
-    // Configure your URL and mail settings here
-    production: {
+    // ### Development **(default)**
+    development: {
         url: process.env.GHOST_URL,
-        forceAdminSSL: true,
         mail: {
             transport: 'SMTP',
             options: {
@@ -69,8 +70,7 @@ config = {
         },
         paths: {
             contentPath: path.join(__dirname, '/content/')
-        },
-        logging: false
+        }
     },
 
     // **Developers only need to edit below here**

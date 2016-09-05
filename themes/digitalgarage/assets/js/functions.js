@@ -22,6 +22,7 @@ jQuery( document ).ready( function( $ ) {
 		initPostShare( $ );
 		initRelatedPosts( $ );
 		loadInstagramPhotos( $ );
+		initCompany( $ );
 		initCopyright( $ );
 		searchBtn( $ );
 		ghostHunter( $ );
@@ -403,10 +404,19 @@ function mediaFeedHeight( $ ) {
 	wrapper.removeClass( 'invisible' );
 }
 
-function initCopyright( $ ) {
+function initCompany( $ ) {
 	'use strict';
 
 	var wrapper = $( '#colophon' ).find( '.bottom-top' );
+	var text = mondoOptions.company_text;
+
+	wrapper.html( text );
+}
+
+function initCopyright( $ ) {
+	'use strict';
+
+	var wrapper = $( '#colophon' ).find( '.copyright' );
 	var text = mondoOptions.copyright_text;
 
 	wrapper.html( text );

@@ -22,8 +22,8 @@ RUN chown -R user $GHOST_SOURCE/content
 # Install GIT
 RUN apt-get update && apt-get install -y git
 
-# Currently only works for development
-ENV NODE_ENV development
+# Set Production Mode
+ENV NODE_ENV production
 
 # Port 2368 for ghost server
 EXPOSE 2368
