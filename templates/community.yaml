@@ -1,0 +1,360 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+kind: Template
+metadata:
+  annotations:
+    description: Template for community page.
+    tags: infrastructure
+  creationTimestamp: 2016-09-20T13:20:42Z
+  name: community-template
+  namespace: openshift
+  resourceVersion: "2598905"
+  selfLink: /oapi/v1/namespaces/openshift/templates/community-template
+  uid: 0829531c-7f35-11e6-8df6-22ac95594225
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/image.dockerRepositoryCheck: 2016-08-08T12:47:55Z
+    creationTimestamp: null
+    generation: 2
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    tags:
+    - annotations:
+        openshift.io/imported-from: thedigitalgarage/community
+      from:
+        kind: DockerImage
+        name: 172.30.112.210:5000/ghost/digitalghost:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${NAME}
+      deploymentconfig: ${NAME}
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.ghost.image.entrypoint: '["/entrypoint.sh","npm","start"]'
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: ${NAME}
+          deploymentconfig: ${NAME}
+      spec:
+        containers:
+        - env:
+          - name: GHOST_URL
+            value: ${APPLICATION_DOMAIN}
+          - name: MAIL_USER
+            value: ${MAIL_USER}
+          - name: MAIL_PWD
+            value: ${MAIL_PASSWORD}
+          - name: MYSQL_USER
+            value: ${MYSQL_USER}
+          - name: MYSQL_PASSWORD
+            value: ${MYSQL_PASSWORD}
+          - name: MYSQL_DATABASE
+            value: ${MYSQL_DATABASE}
+          image: thedigitalgarage/community:latest
+          imagePullPolicy: Always
+          name: ghost
+          ports:
+          - containerPort: 2368
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/lib/ghost
+            name: ${NAME}-volume-1
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: ${NAME}-volume-1
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${NAME}:latest
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: ${NAME}
+  spec:
+    host: ""
+    port:
+      targetPort: 2368-tcp
+    to:
+      kind: Service
+      name: ${NAME}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    ports:
+    - name: 2368-tcp
+      port: 2368
+      protocol: TCP
+      targetPort: 2368
+    selector:
+      app: ${NAME}
+      deploymentconfig: ${NAME}
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: ${DATABASE_SERVICE_NAME}
+  spec:
+    portalIP: ""
+    ports:
+    - name: mysql
+      nodePort: 0
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
+    selector:
+      name: ${DATABASE_SERVICE_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    name: ${DATABASE_SERVICE_NAME}
+  spec:
+    replicas: 1
+    selector:
+      name: ${DATABASE_SERVICE_NAME}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: ${DATABASE_SERVICE_NAME}
+      spec:
+        containers:
+        - capabilities: {}
+          env:
+          - name: MYSQL_USER
+            value: ${MYSQL_USER}
+          - name: MYSQL_PASSWORD
+            value: ${MYSQL_PASSWORD}
+          - name: MYSQL_DATABASE
+            value: ${MYSQL_DATABASE}
+          image: mysql
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 1
+          name: mysql
+          ports:
+          - containerPort: 3306
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - MYSQL_PWD="$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE
+                -e 'SELECT 1'
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: ${MEMORY_LIMIT}
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/lib/mysql/data
+            name: ${DATABASE_SERVICE_NAME}-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        volumes:
+        - emptyDir:
+            medium: ""
+          name: ${DATABASE_SERVICE_NAME}-data
+    triggers:
+    - imageChangeParams:
+        automatic: false
+        containerNames:
+        - mysql
+        from:
+          kind: ImageStreamTag
+          name: mysql:latest
+          namespace: ${NAMESPACE}
+        lastTriggeredImage: ""
+      type: ImageChange
+    - type: ConfigChange
+  status: {}
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.name: ghost-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: ${NAME}
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: ${NAME}
+      openshift.io/deployment-config.name: ${NAME}
+    name: ${NAME}-1
+  spec:
+    replicas: 1
+    selector:
+      app: ${NAME}
+      deployment: ${NAME}-1
+      deploymentconfig: ${NAME}
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.ghost.image.entrypoint: '["/entrypoint.sh","npm","start"]'
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: ${NAME}
+          openshift.io/deployment.name: ${NAME}-1
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: ${NAME}
+          deployment: ${NAME}-1
+          deploymentconfig: ${NAME}
+      spec:
+        containers:
+        - env:
+          - name: GHOST_URL
+            value: ${APPLICATION_DOMAIN}
+          - name: MAIL_USER
+            value: ${MAIL_USER}
+          - name: MAIL_PWD
+            value: ${MAIL_PASSWORD}
+          - name: MYSQL_USER
+            value: ${MYSQL_USER}
+          - name: MYSQL_PASSWORD
+            value: ${MYSQL_PASSWORD}
+          - name: MYSQL_DATABASE
+            value: ${MYSQL_DATABASE}
+          image: thedigitalgarage/community:latest
+          imagePullPolicy: Always
+          name: ${NAME}
+          ports:
+          - containerPort: 2368
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: ${NAME}-volume-1
+  status:
+    replicas: 0
+parameters:
+- description: The name assigned to all of the frontend objects defined in this template.
+  displayName: Name
+  name: NAME
+  required: true
+  value: ghost
+- description: The exposed hostname that will route to the Ghost service.
+  displayName: Application Hostname
+  name: APPLICATION_DOMAIN
+  required: true
+  value: http://www.thedigitalgarage.io/community
+- description: Maximum amount of memory the container can use.
+  displayName: Memory Limit
+  name: MEMORY_LIMIT
+  value: 512Mi
+- description: The OpenShift Namespace where the ImageStream resides.
+  displayName: Namespace
+  name: NAMESPACE
+  value: openshift
+- description: The name of the OpenShift Service exposed for the database.
+  displayName: Database Service Name
+  name: DATABASE_SERVICE_NAME
+  required: true
+  value: mysql
+- description: Username for Mailgun that will be used for creating mail server.
+  displayName: Mailgun User
+  name: MAIL_USER
+- description: Password for mail server.
+  displayName: Maingun Password
+  name: MAIL_PASSWORD
+- description: Username for MySQL user that will be used for accessing the database.
+  displayName: MySQL User
+  from: user[A-Z0-9]{3}
+  generate: expression
+  name: MYSQL_USER
+  required: true
+  value: ghost
+- description: Password for the MySQL user.
+  displayName: MySQL Password
+  from: '[a-zA-Z0-9]{16}'
+  generate: expression
+  name: MYSQL_PASSWORD
+  required: true
+  value: ghost
+- description: Name of the MySQL database accessed.
+  displayName: MySQL Database Name
+  name: MYSQL_DATABASE
+  required: true
+  value: ghost

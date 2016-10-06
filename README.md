@@ -18,7 +18,7 @@ This container uses the official Ghost image as it's base, has a more "environme
 `docker build .`
 
 ### docker hub image
-`david333/ghost_mysql`
+`thedigitalgarage/community`
 
 ### Create a project
 `oc new-project ghost`
@@ -41,4 +41,4 @@ Please visit this `http://support.ghost.org/mail` for mailing details.
 
 ### TheDigitalGarage Community Theme
 
-https://github.com/david-dimas333/thedigitalgarage-theme.git
+https://github.com/thedigitalgarage/community-theme.git

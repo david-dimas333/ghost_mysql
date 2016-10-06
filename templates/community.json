@@ -2,7 +2,11 @@
   "kind": "Template",
   "apiVersion": "v1",
   "metadata": {
-    "name": "digitalgarage-ghost-mysql",
+    "annotations": {
+      "description": "Template for community page.",
+      "tags": "infrastructure"
+    },
+    "name": "community-template",
     "creationTimestamp": null
   },
   "objects": [
@@ -26,7 +30,7 @@
           {
             "name": "latest",
             "annotations": {
-              "openshift.io/imported-from": "david333/ghost_mysql"
+              "openshift.io/imported-from": "thedigitalgarage/community"
             },
             "from": {
               "kind": "DockerImage",
@@ -112,7 +116,7 @@
             "containers": [
               {
                 "name": "ghost",
-                "image": "david333/ghost_mysql:latest",
+                "image": "thedigitalgarage/community:latest",
                 "ports": [
                   {
                     "containerPort": 2368,
@@ -414,7 +418,7 @@
             "containers": [
               {
                 "name": "${NAME}",
-                "image": "david333/ghost_mysql:latest",
+                "image": "thedigitalgarage/community:latest",
                 "ports": [
                   {
                     "containerPort": 2368,

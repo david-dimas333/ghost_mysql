@@ -16,14 +16,18 @@ ADD favicons/small.png              core/built/assets/img/small.png
 ADD favicons/touch-icon-ipad.png    core/built/assets/img/touch-icon-ipad.png
 ADD favicons/touch-icon-iphone.png  core/built/assets/img/touch-icon-iphone.png
 
-# Fix ownership in src
-RUN chown -R user $GHOST_SOURCE/content
+# entrypoint
+ADD entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Install GIT
-RUN apt-get update && apt-get install -y git
+#RUN apt-get update && apt-get install -y git
 
 # Set Production Mode
 ENV NODE_ENV production
 
 # Port 2368 for ghost server
 EXPOSE 2368
+
+# npm start
+CMD ["npm", "start"]
